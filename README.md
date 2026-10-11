@@ -25,20 +25,7 @@ Your repository follows a clean, production-ready structure where all core execu
 
 Due to the large size of medical neuroimaging assets, the raw training data is securely hosted externally to keep the active deployment build and Git architecture completely lightweight.
 
-* **Dataset Download Link:** [Click here to download archive.zip from Google Drive](PASTE_YOUR_GOOGLE_DRIVE_LINK_HERE)
-
-### Local Development Data Setup
-To retrain the model or test your training code locally:
-1. Download the `archive.zip` file using the shared Google Drive link.
-2. Extract the archive contents into a folder named `data/` or `dataset/` in the root of your local project space.
-3. The dataset files will remain local and hidden from your cloud commits since they are completely blocked via your active `.gitignore` rules.
-
----
-
-## 🚀 How it Works (Cloud Architecture)
-
-1. **Training (Local Framework):** `train.py` was executed locally utilizing the 500MB dataset to train the deep learning network, outputting the frozen weights inside `my_model.keras`.
-2. **Inference (Cloud Production/Vercel):** When deployed to the cloud, the system **does not require the raw dataset**. The Flask app (`app.py`) loads the lightweight `my_model.keras` file into active serverless memory and executes quick individual evaluations on user-uploaded images on-the-fly.
+* **Dataset Download Link:** [Click here to download archive.zip]((https://drive.google.com/file/d/11umCeEdumM_JyZ2GpLa_dbuxKOPDBL9p/view?usp=sharing))
 
 ---
 
@@ -48,7 +35,7 @@ Follow these quick commands to run the application server on your laptop:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com
+git clone https://github.com/bunnyispavan/alzheimer_ml
 cd alzheimer_ml
 ```
 
@@ -57,7 +44,7 @@ cd alzheimer_ml
 pip install -r requirements.txt
 ```
 
-### 3. Spin Up the Local Server
+### 3. Running Web on Local Web
 ```bash
 python app.py
 ```
@@ -65,7 +52,20 @@ Once initialized, open your browser and navigate to `http://127.0.0.1:5000` to v
 
 ---
 
-## 🛠️ Built With
+## 🚀 How it Works (The User Experience)
+
+From the perspective of an end-user visiting the app, the entire machine learning pipeline is completely invisible. They interact with a standard, seamless web experience:
+
+1. **Accessing the Site:** The user simply types your deployment URL (like a Vercel link) into their browser. The cloud server immediately delivers the frontend webpage (`index.html`) to their screen. To the user, it looks like a standard, lightweight website.
+2. **Uploading an Image:** The user clicks a button on the screen to upload a brain MRI scan from their device and clicks "Analyze". 
+3. **Instant Cloud Prediction:** In the background, the website sends that single image up to the cloud. The Python script (`app.py`) instantly resizes it to a `224x224` pixel matrix and feeds it into the pre-trained `my_model.keras` file sitting in the root folder.
+4. **Getting the Result:** The model processes the image in milliseconds and determines the stage of dementia. The web app instantly updates the user's screen with the final result (e.g., "Non Dementia"). 
+
+The user never has to download a dataset, install Python, or know anything about TensorFlow—they just get a fast, working web utility.
+
+---
+
+🛠️ Built With
 
 * **Core Web Server:** Flask
 * **Deep Learning Engines:** TensorFlow-CPU / Keras
