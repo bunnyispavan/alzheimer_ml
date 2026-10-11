@@ -1,1 +1,7 @@
-
+archive.zip
+data/
+dataset/
+combined_images/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
