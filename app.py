@@ -1,20 +1,29 @@
 import io
-from flask import Flask, jsonify, render_template, request
+import os
+
+# --- CRITICAL RE-CONFIGURATION FOR RENDER FREE TIER (512MB RAM) ---
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Silence heavy logging warnings
+os.environ["OMP_NUM_THREADS"] = "1"  # Force single thread to save RAM
+os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
+os.environ["TF_NUM_INTEROP_THREADS"] = "1"
+
 import numpy as np
-from PIL import Image
 import tensorflow as tf
+from flask import Flask, jsonify, render_template, request
+from PIL import Image
+
+# Disable internal eager execution memory allocations
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 
 app = Flask(__name__)
 
-# 1. LOAD YOUR ALZHEIMER'S MODEL
+# Load your standard Alzheimer's Keras weights file
 MODEL_PATH = "my_model.keras"
 model = tf.keras.models.load_model(MODEL_PATH)
 
-# 2. DEFINED STAGE LABELS
-# Ensure this list maps perfectly to the output class tracking order of your model
 CLASSES = ["Mild Dementia", "Moderate Dementia", "Non Dementia", "Very Mild Dementia"]
-
-print("✅ Keras model running with 224x224 layout matrix alignment.")
+print("✅ Keras model initialized safely under 512MB environment restrictions.")
 
 
 @app.route("/", methods=["GET"])
@@ -25,7 +34,6 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Check if an actual file was uploaded
         if "file" not in request.files:
             return jsonify({"error": "No file chunk found in the request"}), 400
 
@@ -33,34 +41,25 @@ def predict():
         if file.filename == "":
             return jsonify({"error": "No file selected"}), 400
 
-        # Open the image using Pillow and convert to standard RGB mode
+        # Read image via Pillow and downsample safely
         img = Image.open(io.BytesIO(file.read())).convert("RGB")
-
-        # 3. PREPROCESS THE IMAGE PIXELS
-        # Corrected image dimension structure to 224x224 pixels
         img = img.resize((224, 224))
 
-        # Convert image data matrix into a numpy floating array
+        # Convert image to numpy array matrix
         img_array = tf.keras.utils.img_to_array(img)
-
-        # Scale pixel range between 0.0 and 1.0 (Normalization standard)
-        img_array = img_array / 255.0
-
-        # Expand data dim to create batch format shape: [1, 224, 224, 3]
+        img_array = img_array / 255.0  # Normalize pixel density
         img_array = np.expand_dims(img_array, axis=0)
 
-        # 4. RUN MODEL PREDICTION
-        predictions = model.predict(img_array)
+        # Execute lightweight inference evaluation
+        predictions = model.predict(img_array, batch_size=1, verbose=0)
 
-        # Extract numerical class positioning array index
         predicted_class_idx = int(np.argmax(predictions))
         predicted_label = CLASSES[predicted_class_idx]
 
-        # Return explicit raw string values back to frontend
         return jsonify({"prediction": str(predicted_label)})
 
     except Exception as e:
-        return jsonify({"error": f"API Analysis error line exception: {str(e)}"}), 500
+        return jsonify({"error": f"API Evaluation failed: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
