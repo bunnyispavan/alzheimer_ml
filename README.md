@@ -1,4 +1,4 @@
-# 🧠 Alzheimer's Detection Machine Learning Web App
+# 🧠 Alzheimer's Detection ML Web App
 
 A machine learning-powered web application designed to detect and classify Alzheimer's Disease. This project features a trained deep learning model integrated with a clean Flask web interface, optimized for fast and lightweight cloud deployment.
 
