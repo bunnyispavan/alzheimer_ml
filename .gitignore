@@ -1,7 +1,20 @@
-archive.zip
-data/
-dataset/
-combined_images/
-.ipynb_checkpoints/
-__pycache__/
-*.pyc
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ],
+  "functions": {
+    "app.py": {
+      "excludeFiles": "{train.py,data/**,dataset/**,*.zip,*.tar.gz,**/__pycache__/**,*.csv}"
+    }
+  }
+}
