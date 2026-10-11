@@ -5,7 +5,6 @@ A machine learning-powered web application designed to detect and classify Alzhe
 ---
 
 ## 📁 Repository Structure
-Your repository follows a clean, production-ready structure where all core execution logic and model weights sit directly in the root directory:
 
 ```text
 ├── templates/
